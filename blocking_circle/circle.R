@@ -21,8 +21,10 @@ joined <- full_join(students, students, c('block_id' = 'block_id')) %>%
 # Tidy the data in preparation of Adjacency matrix
 M2 <- spread(joined, freshman_dorm.y, weight, fill = 0)
 rownames(M2) = M2$freshman_dorm.x
-from = rep(rownames(M2), times = ncol(M2)-1)
-to = rep(colnames(M2), each = nrow(M2))[18:306]
+M2 <- M2 %>% ungroup() %>% select(-freshman_dorm.x)
+M2[upper.tri(M2, diag = FALSE)] <- 0
+from = rep(rownames(M2), times = ncol(M2))
+to = rep(colnames(M2), each = nrow(M2))
 values <- M2 %>% ungroup() %>% 
   gather("freshman_dorm.x", "value", "apley":"wigglesworth")
 # Adjacency matrix
@@ -38,3 +40,4 @@ chordDiagram(df, transparency = 0.5, self.link = 2,
 circos.track(track.index = 1, panel.fun = function(x, y) {
   circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
               facing = "clockwise", niceFacing = TRUE, adj = c(0, 1))}, bg.border = NA) 
+

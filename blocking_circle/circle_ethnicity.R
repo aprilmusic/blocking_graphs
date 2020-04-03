@@ -21,13 +21,16 @@ joined <- full_join(students, students, c('block_id' = 'block_id')) %>%
 # Tidy the data in preparation of Adjacency matrix
 M2 <- spread(joined, ethnicity.x, weight, fill = 0)
 rownames(M2) = M2$ethnicity.y
-from = rep(rownames(M2), times = ncol(M2)-1)
-to = rep(colnames(M2), each = nrow(M2))[6:30]
+M2 <- M2 %>% select(-ethnicity.y)
+M2[upper.tri(M2, diag = FALSE)] <- 0
+from = rep(rownames(M2), times = ncol(M2))
+to = rep(colnames(M2), each = nrow(M2))
 values <- M2 %>% ungroup() %>% 
   gather("ethnicity.x", "value", "Asian":"White")
 # Adjacency matrix
 df <- data.frame(from, to, values$value, stringsAsFactors = FALSE) %>%
   filter(to != "ethnicity.x")
+
 
 # Plot chord diagram. Symmetric = FALSE is key for showing blocking groups within same race
 chordDiagram(df, transparency = 0.5, self.link = 2,
