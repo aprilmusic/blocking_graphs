@@ -8,6 +8,9 @@ students <- read_xlsx("STUDENTS1.xlsx") %>%
                     filter(!is.na(freshman_dorm), block_id != 0) %>% 
                     mutate(freshman_dorm = tolower(freshman_dorm)) %>%
                     select(id, freshman_dorm, block_id, link_id)
+students1 <- read_xlsx("STUDENTS1.xlsx") 
+  
+  
 circos.clear()
 
 joined <- full_join(students, students, c('block_id' = 'block_id')) %>%
@@ -20,7 +23,7 @@ rownames(M2) = M2$freshman_dorm.x
 from = rep(rownames(M2), times = ncol(M2)-1)
 to = rep(colnames(M2), each = nrow(M2))[18:306]
 values <- M2 %>% ungroup() %>% 
-  gather("freshman_dorm.x", "value", "apley":"wigglesworth", fill = 0)
+  gather("freshman_dorm.x", "value", "apley":"wigglesworth")
 df <- data.frame(from, to, values$value, stringsAsFactors = FALSE) %>%
     filter(to != "freshman_dorm.x")
 
@@ -29,8 +32,8 @@ g <- graph_from_data_frame(joined, directed = TRUE)
 # Create adjacency matrix from graph
 M <- as.matrix(as_adjacency_matrix(g), attr = "weight")
 # #
-chordDiagram(df, transparency = 0.5, self.link = 1,
-           annotationTrack = "grid", 
+chordDiagram(df, transparency = 0.5, self.link = 2,
+           annotationTrack = "grid", symmetric = FALSE,
            preAllocateTracks = list(track.height = max(strwidth(unlist(dimnames(df))))))
 
 circos.track(track.index = 1, panel.fun = function(x, y) {
