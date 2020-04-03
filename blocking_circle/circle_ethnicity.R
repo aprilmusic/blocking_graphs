@@ -5,7 +5,7 @@ library(circlize)
 library(igraph)
 
 students <- read_xlsx("STUDENTS1.xlsx") %>% 
-  filter(!is.na(ethnicity), block_id != 0, ethnicity != "Prefer not to say") %>% 
+  filter(!is.na(ethnicity), block_id != 0, !(ethnicity %in% c("Prefer not to say", "Native American"))) %>% 
   mutate(ethnicity = recode(ethnicity, "Other/multracial" = "Other/multiracial")) %>%
   select(id, ethnicity, block_id, link_id)
 
@@ -19,7 +19,7 @@ M2 <- spread(joined, ethnicity.x, weight, fill = 0)
 rownames(M2) = M2$ethnicity.y
 
 from = rep(rownames(M2), times = ncol(M2)-1)
-to = rep(colnames(M2), each = nrow(M2))[7:42]
+to = rep(colnames(M2), each = nrow(M2))[6:30]
 values <- M2 %>% ungroup() %>% 
   gather("ethnicity.x", "value", "Asian":"White")
 df <- data.frame(from, to, values$value, stringsAsFactors = FALSE) %>%
